@@ -1,2 +1,2 @@
 # file-reader
-Upload a file, display and filter it's data.
+Upload a file, display and filter its data.
