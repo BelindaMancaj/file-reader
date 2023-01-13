@@ -1,21 +1,22 @@
 let text, textArray;
-var fileToBeUploaded = document.getElementById("file");
+var fileToBeUploaded = document.querySelector("#file");
 let displayDiv = document.querySelector(".display");
 let loadingDiv = document.querySelector(".loading");
-let dataTable = document.getElementById("data-table");
-let searchBox = document.getElementById("search-box");
+let dataTable = document.querySelector("#data-table");
+let searchBox = document.querySelector("#search-box");
 
 async function loadFile(file) {
   loadingDiv.style.display = "block";
-  text = await file.text();
+
+  text = await file.text(); //Get file data
+
   loadingDiv.style.display = "none";
   displayDiv.style.display = "block";
-
-  textArray = text.substring(0, 5005).split(/\r?\n/);
-
-  const table = createTable(textArray);
-
-  dataTable.appendChild(table);
+  //Creating an array with substrings separated by white spaces
+  //removing the first element, which is the columns name
+  textArray = text.substring(0, 5005).split(/\r?\n/).slice(1);
+  let table = createTable(textArray);
+  dataTable.appendChild(table); //Display the created table
 }
 
 const createTable = (fileTextArray) => {
@@ -24,11 +25,13 @@ const createTable = (fileTextArray) => {
     i;
   table.style.border = "1px solid black";
 
-  for (i = 1; i < fileTextArray.length; i++) {
+  for (i = 0; i < fileTextArray.length; i++) {
+    //Creatig a table row for every array element
     tr = document.createElement("tr");
     tr.style.border = "1px solid black";
 
-    let lineArray = fileTextArray[i].split(",");
+    let lineArray = fileTextArray[i].split(","); //creatig an array with every word
+    //iterating the array to display its data in the table
     for (j = 0; j < lineArray.length; j++) {
       tr.innerHTML = `
     <td>${lineArray[0]} ${lineArray[1]}</td>|
@@ -42,10 +45,21 @@ const createTable = (fileTextArray) => {
   return table;
 };
 
-const filterData = () => {
-  let val = searchBox.value;
-  console.log(textArray.filter((txt) => txt == "Ruth"));
-  // return textArray.filter((txt) => txt == val);
+const filterData = (txtArr) => {
+  let val = searchBox.value.toLowerCase();
+  //filter
+  const filteredValues = txtArr.filter((txt) =>
+    txt.toLowerCase().includes(val)
+  );
+  //Removes the child so that only the filtered table is displayed
+  dataTable.removeChild(dataTable.lastChild);
+
+  if (filteredValues.length <= 0) {
+    dataTable.innerHTML = "No data!";
+  } else {
+    let filteredTable = createTable(filteredValues);
+    dataTable.appendChild(filteredTable);
+  }
 };
 
-searchBox.addEventListener("change", filterData);
+searchBox.addEventListener("change", () => filterData(textArray));
